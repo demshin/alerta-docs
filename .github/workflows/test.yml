@@ -1,0 +1,42 @@
+name: Test
+
+on:
+  push:
+    # tags:
+    # - 'v*'
+
+env:
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: install
+        run:
+          pip install -r requirements.txt
+      - name: nitpick
+        id: nitpick
+        run:
+          sphinx-build -b html -n . _build/html
+      - name: linkcheck
+        id: linkcheck
+        run:
+          sphinx-build -b linkcheck . _build/linkcheck
+      - name: spelling
+        id: spelling
+        run:
+          sphinx-build -b spelling . _build/spelling
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: install
+        run:
+          pip install -r requirements.txt
+      - name: build
+        id: build
+        run:
+          sphinx-build -b html -d _build/doctrees . _build/html
